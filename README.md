@@ -53,11 +53,13 @@ The codebase enforces a strict separation between the game engine and everything
 │  │  basicStrategy.ts  Full hard/soft/pair lookup tables │    │
 │  │  analytics.ts      Session stats, hand records,      │    │
 │  │                    optimal play tracking              │    │
+│  │  counting.ts       Hi-Lo running/true count           │    │
+│  │  persistence.ts    localStorage session save/load     │    │
 │  │  scoring.ts        Hand evaluation (soft/hard/bust)  │    │
 │  │  deck.ts           Multi-deck shoe, Fisher-Yates     │    │
 │  │  constants.ts      Config, denominations, phases     │    │
 │  └──────────────────────────────────────────────────────┘    │
-│  138 unit tests across 5 test files                          │
+│  158 unit tests across 7 test files                          │
 │  Zero React. Zero DOM. Pure (state, action) => state.        │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -87,6 +89,9 @@ Built with React Three Fiber and drei. Five GLTF models (blackjack table, chip t
 ### Procedural Audio
 Sound effects are generated with the Web Audio API, not pre-recorded samples. Card dealing, chip stacking, and shuffle sounds are synthesized at runtime.
 
+### Trainer
+Two opt-in training layers, both persisted across sessions. Coach mode highlights the basic-strategy-optimal button on every decision, including decline-insurance and decline-even-money. The count trainer maintains a Hi-Lo running count in the engine (face-up cards only, banked across rounds, reset on reshuffle) and quizzes you on it every fifth hand, tracking your accuracy alongside your optimal play rate. Chips, stats, and hand history survive reloads via localStorage; the shoe is always fresh so the count starts clean.
+
 <br/>
 
 ## Key Engineering Decisions
@@ -97,22 +102,24 @@ Sound effects are generated with the Web Audio API, not pre-recorded samples. Ca
 | **Instrumented reducer pattern** | Analytics capture wraps the game reducer without touching game logic. Adding new metrics requires zero changes to the engine |
 | **React Three Fiber over raw Three.js** | Declarative scene graph matches React mental model. GLTF models load via drei hooks. Camera animation uses useFrame |
 | **styled-components over Tailwind** | UI panels overlay a 3D canvas. CSS-in-JS scoping prevents style leaks between the DOM overlay and the WebGL layer |
-| **Vitest over Jest** | Native ESM, Vite-aligned config, faster test execution for the 138-test suite |
+| **Vitest over Jest** | Native ESM, Vite-aligned config, faster test execution for the 159-test suite |
 | **GLTF models over procedural geometry** | Authentic set dressing (whiskey glass, fedora, 1911) sells the aesthetic in ways that boxes and cylinders can't |
 
 <br/>
 
 ## Testing
 
-138 tests across 5 test files covering the entire game engine:
+158 tests across 7 test files covering the entire game engine:
 
 | File | Tests | Coverage |
 |------|-------|----------|
 | `gameEngine.test.ts` | 57 | Full game lifecycle: deal, hit, stand, double, split, surrender, insurance, even money, settlement, edge cases |
-| `basicStrategy.test.ts` | 45 | Lookup table correctness for hard/soft/pair decisions, fallback downgrades when actions unavailable |
+| `basicStrategy.test.ts` | 46 | Lookup table correctness for hard/soft/pair decisions, fallback downgrades when actions unavailable |
 | `analytics.test.ts` | 13 | Session stat computation, hand record creation, optimal play detection |
+| `counting.test.ts` | 13 | Hi-Lo values, face-down exclusion, true count conversion, cross-round count banking, reshuffle reset |
 | `deck.test.ts` | 10 | Shoe creation, draw mechanics, reshuffle threshold |
 | `scoring.test.ts` | 13 | Hand evaluation: soft/hard detection, ace revaluation, bust, blackjack |
+| `persistence.test.ts` | 6 | Session round-trips, corrupt data handling, history cap |
 
 ```bash
 npm test        # run all tests
@@ -147,26 +154,31 @@ src/
     gameEngine.ts        State reducer: 14 actions, phase guards, settlement
     basicStrategy.ts     Hard/soft/pair lookup tables, optimal action resolution
     analytics.ts         Session stats, hand records, optimal play tracking
+    counting.ts          Hi-Lo card counting (running count, true count)
+    persistence.ts       localStorage session save/load with validation
     scoring.ts           Hand evaluation (soft, hard, bust, blackjack)
     deck.ts              Multi-deck shoe, Fisher-Yates shuffle
     constants.ts         Phases, actions, results, chip denominations, config
-    instrumentedReducer  Analytics wrapper around game reducer
-    *.test.ts            138 unit tests
+    instrumentedReducer  Analytics and count wrapper around game reducer
+    *.test.ts            158 unit tests
 
   components/
-    Scene.tsx            Orchestrator (betting, animations, streaks, debug)
+    Scene.tsx            Orchestrator (betting, animations, streaks, trainer, debug)
     GameTable.tsx        R3F Canvas wrapper (models, cards, lighting)
-    GameControls.tsx     Hit/Stand/Double/Split/Surrender buttons
+    GameControls.tsx     Hit/Stand/Double/Split/Surrender buttons, coach hints
     BettingPanel.tsx     Chip denomination selector
     StatsPanel.tsx       Session stats overlay
-    TendenciesPanel.tsx  Analytics slide-out with charts
+    TendenciesPanel.tsx  Analytics slide-out with charts (lazy-loaded)
+    TrainerPanel.tsx     Coach and count trainer toggles, session reset
+    CountCheck.tsx       Running count quiz prompt
     ResultFlash.tsx      Win/lose/push animated overlay
     DebugPanel.tsx       Performance toggles (shadows, grain, post-fx)
     Hand.tsx             Card fan layout
     models/              GLTF model components (table, cards, chips, props)
 
   hooks/
-    useBlackjack.ts      React binding for game reducer + dealer auto-play
+    useBlackjack.ts      React binding for game reducer, dealer auto-play, persistence
+    useKeyboardShortcuts.ts  Full keyboard control (H/S/D/P/R, chips, deal)
     useSounds.ts         Web Audio API procedural sound effects
 
   styled/                styled-components definitions

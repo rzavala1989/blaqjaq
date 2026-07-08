@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { animated } from '@react-spring/web';
 
 // === Game Board ===
@@ -603,7 +603,17 @@ const variantGlow: Record<CasinoVariant, string> = {
   rebuy:  'rgba(112, 72, 32, 0.35)',
 };
 
-export const CasinoButton = styled.button<{ $variant?: CasinoVariant }>`
+const coachPulse = keyframes`
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(200, 170, 80, 0.45), inset 0 0 4px rgba(200, 170, 80, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(200, 170, 80, 0.75), 0 0 32px rgba(200, 170, 80, 0.25),
+      inset 0 0 8px rgba(200, 170, 80, 0.35);
+  }
+`;
+
+export const CasinoButton = styled.button<{ $variant?: CasinoVariant; $hint?: boolean }>`
   padding: 0.85rem 2.4rem;
   color: #e4dcc8;
   border-radius: 2px;
@@ -638,7 +648,40 @@ export const CasinoButton = styled.button<{ $variant?: CasinoVariant }>`
     filter: none;
   }
 
+  ${({ $hint }) =>
+    $hint &&
+    css`
+      border-color: #c8aa50;
+      animation: ${coachPulse} 1.6s ease-in-out infinite;
+    `}
+
   @media (prefers-reduced-motion: reduce) {
     transition: none;
+    animation: none;
+    ${({ $hint }) => $hint && 'box-shadow: 0 0 10px rgba(200, 170, 80, 0.6);'}
+  }
+`;
+
+// === Slide-out Panel Toggle (Tendencies) ===
+
+export const PanelToggleButton = styled.button<{ $open: boolean }>`
+  position: fixed;
+  top: 1.25rem;
+  right: ${({ $open }) => ($open ? '308px' : '0.75rem')};
+  z-index: 51;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(200, 185, 155, 0.18);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.5), 0 0 1px rgba(200, 185, 155, 0.1);
+  color: rgba(200, 185, 155, 0.7);
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  transition: right 0.3s ease, color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: rgba(228, 220, 200, 0.85);
+    border-color: rgba(200, 185, 155, 0.3);
   }
 `;

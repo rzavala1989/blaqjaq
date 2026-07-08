@@ -40,6 +40,9 @@ export interface GameState {
   sessionStats: SessionStats;
   currentHandActions: ActionValue[];
   chipsBefore: number;
+  // Hi-Lo count carried over from completed rounds this shoe;
+  // maintained by instrumentedReducer, reset on reshuffle
+  countBase: number;
 }
 
 export type GameAction =
@@ -91,6 +94,7 @@ export function createInitialState(config: Partial<GameConfig> = {}): GameState 
     sessionStats: createEmptySessionStats(mergedConfig),
     currentHandActions: [],
     chipsBefore: mergedConfig.startingChips,
+    countBase: 0,
   };
 }
 

@@ -50,28 +50,6 @@ const Panel = styled.div<{ $open: boolean }>`
   }
 `;
 
-const ToggleButton = styled.button<{ $open: boolean }>`
-  position: fixed;
-  top: 1.25rem;
-  right: ${({ $open }) => ($open ? '308px' : '0.75rem')};
-  z-index: 51;
-  background: rgba(0, 0, 0, 0.85);
-  border: 1px solid rgba(200, 185, 155, 0.18);
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.5), 0 0 1px rgba(200, 185, 155, 0.1);
-  color: rgba(200, 185, 155, 0.7);
-  font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  padding: 0.35rem 0.6rem;
-  cursor: pointer;
-  transition: right 0.3s ease, color 0.15s, border-color 0.15s;
-
-  &:hover {
-    color: rgba(228, 220, 200, 0.85);
-    border-color: rgba(200, 185, 155, 0.3);
-  }
-`;
-
 const PanelContent = styled.div`
   padding: 1rem 0.85rem;
   display: flex;
@@ -298,10 +276,6 @@ export function TendenciesPanel({
 
   return (
     <>
-      <ToggleButton $open={open} onClick={onToggle}>
-        {open ? '\u2715' : '\u2261 Stats'}
-      </ToggleButton>
-
       {open && <Overlay $open={open} onClick={onToggle} />}
 
       <Panel $open={open}>

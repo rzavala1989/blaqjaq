@@ -6,6 +6,7 @@ export type StrategyAction = 'H' | 'S' | 'D' | 'Ds' | 'P' | 'R' | 'Rs';
 
 // Hard totals: player total (5-21) vs dealer upcard (2-11, where 11=Ace)
 export const HARD_TOTALS: Record<number, Record<number, StrategyAction>> = {
+  4:  { 2: 'H', 3: 'H', 4: 'H', 5: 'H', 6: 'H', 7: 'H', 8: 'H', 9: 'H', 10: 'H', 11: 'H' },
   5:  { 2: 'H', 3: 'H', 4: 'H', 5: 'H', 6: 'H', 7: 'H', 8: 'H', 9: 'H', 10: 'H', 11: 'H' },
   6:  { 2: 'H', 3: 'H', 4: 'H', 5: 'H', 6: 'H', 7: 'H', 8: 'H', 9: 'H', 10: 'H', 11: 'H' },
   7:  { 2: 'H', 3: 'H', 4: 'H', 5: 'H', 6: 'H', 7: 'H', 8: 'H', 9: 'H', 10: 'H', 11: 'H' },
@@ -27,6 +28,7 @@ export const HARD_TOTALS: Record<number, Record<number, StrategyAction>> = {
 
 // Soft totals: player soft total (13-21) vs dealer upcard (2-11, where 11=Ace)
 export const SOFT_TOTALS: Record<number, Record<number, StrategyAction>> = {
+  12: { 2: 'H', 3: 'H', 4: 'H', 5: 'H', 6: 'H', 7: 'H', 8: 'H', 9: 'H', 10: 'H', 11: 'H' },
   13: { 2: 'H', 3: 'H', 4: 'H', 5: 'D', 6: 'D', 7: 'H', 8: 'H', 9: 'H', 10: 'H', 11: 'H' },
   14: { 2: 'H', 3: 'H', 4: 'H', 5: 'D', 6: 'D', 7: 'H', 8: 'H', 9: 'H', 10: 'H', 11: 'H' },
   15: { 2: 'H', 3: 'H', 4: 'D', 5: 'D', 6: 'D', 7: 'H', 8: 'H', 9: 'H', 10: 'H', 11: 'H' },

@@ -1,5 +1,15 @@
 # Performance
 
+## Demand Rendering
+
+The Canvas switches `frameloop` between `always` and `demand` based on scene activity. Animation windows that force the full loop: camera intro (`!controlsReady`), card motion (`!dealtReady`), shuffle animation (1.5s after shoe reset), and the FPS stats overlay. A 500ms trailing hold (`useHeldFlag` in Scene) lets settling frames finish before the loop drops to demand. While idle between hands the GPU renders nothing; React state changes (card reveals, chip updates) auto-invalidate single frames.
+
+## Bundle Splitting
+
+- `TendenciesPanel` (recharts, ~313KB) is `React.lazy`-loaded on first open; the toggle button lives in Scene so nothing chart-related ships in the main bundle.
+- `manualChunks` in vite.config: a `three` chunk (three, fiber, drei, postprocessing; ~1.2MB, cacheable across deploys) and a `react` chunk (react, react-dom, styled-components).
+- App code chunk after the split: ~193KB (was a single 1.4MB bundle).
+
 ## Debug Panel
 
 Toggle with `perf` button (bottom-right). Controls:

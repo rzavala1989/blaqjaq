@@ -37,10 +37,12 @@ BETTING → DEALING → PEEKING → PLAYER_TURN → DEALER_TURN → RESOLVING �
 
 Two additional modules extend the engine without touching its logic:
 
-- `basicStrategy.ts` - Vegas Strip 6-deck H17 DAS late-surrender lookup tables. `getOptimalAction(playerCards, dealerUpcard, canDouble, canSplit, canSurrender)` returns the correct `ActionValue` with full downgrade logic (D to H if no double available, R to H if no surrender, P to hard/soft fallback if no split).
+- `basicStrategy.ts` - Vegas Strip 6-deck H17 DAS late-surrender lookup tables. `getOptimalAction(playerCards, dealerUpcard, canDouble, canSplit, canSurrender)` returns the correct `ActionValue` with full downgrade logic (D to H if no double available, R to H if no surrender, P to hard/soft fallback if no split). Tables include hard 4 and soft 12 rows so unsplittable low pairs (2,2 and A,A) resolve without falling off the chart.
 - `analytics.ts` - `HandRecord` and `SessionStats` types plus `buildHandRecord` and `deriveSessionStats` pure functions.
-- `instrumentedReducer.ts` - Wraps `gameReducer`. Detects every `prevPhase !== SETTLED, nextPhase === SETTLED` transition and appends records to `handHistory`, recomputing `sessionStats`. Also tracks `currentHandActions` and `chipsBefore` per round.
+- `counting.ts` - Hi-Lo card counting. `hiLoValue(card)`, `roundVisibleCount(state)` (face-up cards only; an unrevealed hole card is never counted), `runningCount(state)`, `trueCount(running, shoeLength)`. `GameState.countBase` carries the count across rounds; `instrumentedReducer` banks each round's visible cards into it on NEW_ROUND and resets it on reshuffle.
+- `persistence.ts` - localStorage session save/load. Chips, W/L stats, and hand history (capped at 500 records) survive reloads; the shoe is always fresh on load so the count starts clean. Versioned blob with shape validation, corrupt data falls back to a new session.
+- `instrumentedReducer.ts` - Wraps `gameReducer`. Detects every `prevPhase !== SETTLED, nextPhase === SETTLED` transition and appends records to `handHistory`, recomputing `sessionStats`. Also tracks `currentHandActions`, `chipsBefore`, and `countBase` per round.
 
 ## Testing
 
-139 tests via Vitest. Deterministic shoes built with reversed arrays so the first card drawn is predictable. Tests cover: scoring edge cases, bust detection, blackjack detection, split/double logic, payout calculations, shoe reshuffling, basic strategy known hands and downgrade logic, analytics record building and session stat derivation.
+158 engine tests via Vitest. Deterministic shoes built with reversed arrays so the first card drawn is predictable. Tests cover: scoring edge cases, bust detection, blackjack detection, split/double logic, payout calculations, shoe reshuffling, basic strategy known hands and downgrade logic, analytics record building and session stat derivation, Hi-Lo count values and cross-round banking, persistence round-trips and corrupt-data handling.

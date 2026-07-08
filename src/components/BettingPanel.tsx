@@ -33,21 +33,23 @@ export function BettingPanel({ game, currentBet, addToBet, clearBet, onDeal, dea
     <BettingRow>
       {DENOMINATIONS.map(denom => {
         const disabled = currentBet + denom > maxBet || currentBet + denom > game.chips;
+        const keyHint = [...DENOMINATIONS].sort((a, b) => a - b).indexOf(denom) + 1;
         return (
           <ChipButton
             key={denom}
             $color={CHIP_COLORS[denom]}
             disabled={disabled}
             onClick={() => { addToBet(denom); playChipClick(); }}
+            title={String(keyHint)}
           >
             {denom}
           </ChipButton>
         );
       })}
-      <CasinoButton $variant="danger" onClick={clearBet} disabled={currentBet <= minBet}>
+      <CasinoButton $variant="danger" onClick={clearBet} disabled={currentBet <= minBet} title="C">
         Clear
       </CasinoButton>
-      <CasinoButton $variant="deal" onClick={onDeal} disabled={!dealtReady || game.chips < currentBet || game.bankrupt}>
+      <CasinoButton $variant="deal" onClick={onDeal} disabled={!dealtReady || game.chips < currentBet || game.bankrupt} title="Space">
         Deal
       </CasinoButton>
     </BettingRow>

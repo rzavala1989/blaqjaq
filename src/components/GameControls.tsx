@@ -1,5 +1,6 @@
 import type { useBlackjack } from '../hooks/useBlackjack';
-import { Phase } from '../game/constants';
+import { Phase, Action } from '../game/constants';
+import type { ActionValue } from '../game/constants';
 import {
   ControlsPanel, CasinoButton,
   BarLeftSection, BarCenter, BarRightSection,
@@ -26,9 +27,10 @@ interface GameControlsProps {
   addToBet: (n: number) => void;
   clearBet: () => void;
   onDeal: () => void;
+  coachTarget?: ActionValue | null;
 }
 
-export function GameControls({ game, dealtReady, currentBet, addToBet, clearBet, onDeal }: GameControlsProps) {
+export function GameControls({ game, dealtReady, currentBet, addToBet, clearBet, onDeal, coachTarget = null }: GameControlsProps) {
   const isBetting = game.phase === Phase.BETTING;
   const isSettled = game.phase === Phase.SETTLED;
   const hasPlayerCards = (game.hands[0]?.cards.length ?? 0) > 0;
@@ -60,39 +62,39 @@ export function GameControls({ game, dealtReady, currentBet, addToBet, clearBet,
 
         {game.showInsurance && (
           <>
-            <CasinoButton $variant="gold" onClick={game.insurance} disabled={!dealtReady}>Insurance</CasinoButton>
-            <CasinoButton $variant="danger" onClick={game.declineInsurance} disabled={!dealtReady}>No Insurance</CasinoButton>
+            <CasinoButton $variant="gold" onClick={game.insurance} disabled={!dealtReady} title="I">Insurance</CasinoButton>
+            <CasinoButton $variant="danger" onClick={game.declineInsurance} disabled={!dealtReady} title="N" $hint={coachTarget === Action.DECLINE_INSURANCE}>No Insurance</CasinoButton>
           </>
         )}
 
         {game.showEvenMoney && (
           <>
-            <CasinoButton $variant="gold" onClick={game.evenMoney} disabled={!dealtReady}>Even Money</CasinoButton>
-            <CasinoButton $variant="danger" onClick={game.declineEvenMoney} disabled={!dealtReady}>Decline</CasinoButton>
+            <CasinoButton $variant="gold" onClick={game.evenMoney} disabled={!dealtReady} title="Y">Even Money</CasinoButton>
+            <CasinoButton $variant="danger" onClick={game.declineEvenMoney} disabled={!dealtReady} title="N" $hint={coachTarget === Action.DECLINE_EVEN_MONEY}>Decline</CasinoButton>
           </>
         )}
 
         {game.canHit && (
-          <CasinoButton $variant="action" onClick={game.hit} disabled={!dealtReady}>Hit</CasinoButton>
+          <CasinoButton $variant="action" onClick={game.hit} disabled={!dealtReady} title="H" $hint={coachTarget === Action.HIT}>Hit</CasinoButton>
         )}
         {game.canStand && (
-          <CasinoButton $variant="action" onClick={game.stand} disabled={!dealtReady}>Stand</CasinoButton>
+          <CasinoButton $variant="action" onClick={game.stand} disabled={!dealtReady} title="S" $hint={coachTarget === Action.STAND}>Stand</CasinoButton>
         )}
         {game.canDouble && (
-          <CasinoButton $variant="power" onClick={game.doubleDown} disabled={!dealtReady}>Double</CasinoButton>
+          <CasinoButton $variant="power" onClick={game.doubleDown} disabled={!dealtReady} title="D" $hint={coachTarget === Action.DOUBLE_DOWN}>Double</CasinoButton>
         )}
         {game.canSplitHand && (
-          <CasinoButton $variant="power" onClick={game.split} disabled={!dealtReady}>Split</CasinoButton>
+          <CasinoButton $variant="power" onClick={game.split} disabled={!dealtReady} title="P" $hint={coachTarget === Action.SPLIT}>Split</CasinoButton>
         )}
         {game.canSurrenderHand && (
-          <CasinoButton $variant="danger" onClick={game.surrender} disabled={!dealtReady}>Surrender</CasinoButton>
+          <CasinoButton $variant="danger" onClick={game.surrender} disabled={!dealtReady} title="R" $hint={coachTarget === Action.SURRENDER}>Surrender</CasinoButton>
         )}
 
         {isSettled && (
-          <CasinoButton $variant="deal" onClick={game.newRound} disabled={!dealtReady}>New Round</CasinoButton>
+          <CasinoButton $variant="deal" onClick={game.newRound} disabled={!dealtReady} title="Space">New Round</CasinoButton>
         )}
         {game.bankrupt && (
-          <CasinoButton $variant="rebuy" onClick={game.rebuy}>Rebuy</CasinoButton>
+          <CasinoButton $variant="rebuy" onClick={game.rebuy} title="B">Rebuy</CasinoButton>
         )}
       </BarCenter>
 

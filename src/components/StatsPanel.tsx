@@ -22,32 +22,33 @@ const Box = styled.div`
   background: rgba(0, 0, 0, 0.85);
   border: 1px solid rgba(200, 185, 155, 0.18);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.6), 0 0 1px rgba(200, 185, 155, 0.1);
-  padding: 0.75rem 1rem;
+  padding: 1rem 1.35rem;
   font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 0.78rem;
+  font-size: 1rem;
 `;
 
 const StatsBox = styled(Box)`
-  width: 180px;
+  width: 240px;
 `;
 
 const Row = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 2rem;
-  padding: 0.15rem 0;
+  padding: 0.28rem 0;
 `;
 
 const Label = styled.span`
-  color: rgba(200, 185, 155, 0.4);
+  color: rgba(200, 185, 155, 0.55);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-shadow: 0 0 8px rgba(200, 185, 155, 0.08);
 `;
 
 const Value = styled.span`
-  color: rgba(228, 220, 200, 0.85);
+  color: rgba(228, 220, 200, 0.92);
   font-variant-numeric: tabular-nums;
+  font-weight: bold;
   text-shadow: 0 0 6px rgba(228, 220, 200, 0.1);
 `;
 
@@ -62,11 +63,11 @@ const HandSection = styled.div`
 `;
 
 const HandLabel = styled.div`
-  color: rgba(200, 185, 155, 0.3);
+  color: rgba(200, 185, 155, 0.5);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-size: 0.65rem;
-  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
+  margin-bottom: 0.4rem;
 `;
 
 const HandRow = styled.div`
@@ -76,8 +77,8 @@ const HandRow = styled.div`
 `;
 
 const MiniCard = styled.div<{ $red?: boolean; $faceDown?: boolean }>`
-  width: 44px;
-  height: 62px;
+  width: 54px;
+  height: 76px;
   border-radius: 3px;
   background: ${({ $faceDown }) => $faceDown ? '#1a1a8c' : '#ffffff'};
   border: 1px solid ${({ $faceDown }) => $faceDown ? 'rgba(240, 230, 200, 0.35)' : '#bbb'};
@@ -95,12 +96,12 @@ const MiniCard = styled.div<{ $red?: boolean; $faceDown?: boolean }>`
 `;
 
 const MiniRank = styled.span`
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1;
 `;
 
 const MiniSuit = styled.span`
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1;
   margin-top: 1px;
 `;
@@ -110,7 +111,7 @@ const MiniCenterSuit = styled.span<{ $red?: boolean }>`
   top: 52%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 26px;
+  font-size: 32px;
   opacity: 0.15;
   color: ${({ $red }) => $red ? '#cc2222' : '#111'};
 `;
@@ -124,17 +125,18 @@ const MiniBackPattern = styled.div`
 
 const MiniBackQ = styled.span`
   margin: auto;
-  font-size: 20px;
+  font-size: 24px;
   font-family: serif;
   color: rgba(240, 230, 200, 0.4);
   z-index: 1;
 `;
 
 const HandScore = styled.span`
-  color: rgba(228, 220, 200, 0.85);
+  color: rgba(228, 220, 200, 0.92);
   font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 1rem;
-  margin-left: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-left: 0.6rem;
   font-variant-numeric: tabular-nums;
 `;
 

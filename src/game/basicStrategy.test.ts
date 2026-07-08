@@ -319,15 +319,23 @@ describe('getOptimalAction - pair fallback when canSplit is false', () => {
     expect(result).toBe(Action.HIT);
   });
 
-  it('pair of Aces falls through to soft 12 when cannot split', () => {
-    // A+A = soft 12, which is not in soft totals (starts at 13), so hard 12
-    // Hard 12 vs dealer 6 = S
+  it('pair of Aces falls through to soft 12 (hit) when cannot split', () => {
+    // A+A = soft 12: cannot bust, so hitting always beats standing
     const result = getOptimalAction(
       [card('A', 'H'), card('A', 'S')],
       card('6'),
       true, false, true,
     );
-    expect(result).toBe(Action.STAND);
+    expect(result).toBe(Action.HIT);
+  });
+
+  it('pair of 2s falls through to hard 4 (hit) when cannot split', () => {
+    const result = getOptimalAction(
+      [card('2', 'H'), card('2', 'S')],
+      card('6'),
+      true, false, true,
+    );
+    expect(result).toBe(Action.HIT);
   });
 
   it('pair of 9s falls through to hard 18 vs dealer 7 = stand when cannot split', () => {

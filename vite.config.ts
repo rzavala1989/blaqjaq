@@ -11,6 +11,21 @@ export default defineConfig({
   resolve: {
     dedupe: ['react', 'react-dom', 'styled-components'],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          three: [
+            'three',
+            '@react-three/fiber',
+            '@react-three/drei',
+            '@react-three/postprocessing',
+          ],
+          react: ['react', 'react-dom', 'styled-components'],
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

@@ -5,9 +5,27 @@ import type { GameState, GameAction } from '../game/gameEngine';
 import { Phase, Action } from '../game/constants';
 import type { GameConfig } from '../game/constants';
 import { evaluateHand, evaluateHandFull } from '../game/scoring';
+import { saveSession, loadSession, clearSession } from '../game/persistence';
+import { deriveSessionStats } from '../game/analytics';
+
+// Restore chips, stats, and history from a prior sitting; the shoe is
+// always fresh, so the count starts clean
+function hydratedInitialState(config: Partial<GameConfig>): GameState {
+  const initial = createInitialState(config);
+  const saved = loadSession();
+  if (!saved) return initial;
+  return {
+    ...initial,
+    chips: saved.chips,
+    chipsBefore: saved.chips,
+    stats: saved.stats,
+    handHistory: saved.handHistory,
+    sessionStats: deriveSessionStats(saved.handHistory, initial.config),
+  };
+}
 
 export function useBlackjack(config: Partial<GameConfig> = {}) {
-  const [state, setState] = useState<GameState>(() => createInitialState(config));
+  const [state, setState] = useState<GameState>(() => hydratedInitialState(config));
 
   const dispatch = useCallback((action: GameAction) => {
     setState(prev => instrumentedReducer(prev, action));
@@ -16,6 +34,18 @@ export function useBlackjack(config: Partial<GameConfig> = {}) {
   const resetGame = useCallback(() => {
     setState(createInitialState(config));
   }, [config]);
+
+  const resetSession = useCallback(() => {
+    clearSession();
+    setState(createInitialState(config));
+  }, [config]);
+
+  // Persist at settlement (covers rebuy too, which only happens while settled)
+  useEffect(() => {
+    if (state.phase === Phase.SETTLED) {
+      saveSession(state);
+    }
+  }, [state.phase, state.chips]);
 
   // Atomic bet + deal in a single state update — avoids two-step setState in UI
   const dealRound = useCallback((amount: number) => {
@@ -136,6 +166,7 @@ export function useBlackjack(config: Partial<GameConfig> = {}) {
     dealerFullEval,
 
     resetGame,
+    resetSession,
     dealRound,
     placeBet,
     deal,

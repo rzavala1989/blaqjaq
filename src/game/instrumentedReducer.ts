@@ -3,6 +3,7 @@ import type { ActionValue } from './constants';
 import { gameReducer } from './gameEngine';
 import type { GameState, GameAction } from './gameEngine';
 import { buildHandRecord, deriveSessionStats } from './analytics';
+import { roundVisibleCount } from './counting';
 
 const PLAYER_ACTIONS = new Set<string>([
   Action.HIT,
@@ -49,9 +50,12 @@ export function instrumentedReducer(state: GameState, action: GameAction): GameS
     };
   }
 
-  // 5. Clear actions on NEW_ROUND
+  // 5. On NEW_ROUND: bank the round's visible cards into the running
+  // count (prev state still holds them), reset on reshuffle, clear actions
   if (action.type === Action.NEW_ROUND) {
-    next = { ...next, currentHandActions: [] };
+    const reshuffled = next.shoe.length > state.shoe.length;
+    const countBase = reshuffled ? 0 : state.countBase + roundVisibleCount(state);
+    next = { ...next, currentHandActions: [], countBase };
   }
 
   return next;
