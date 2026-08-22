@@ -76,7 +76,7 @@ function metricCount(metrics, name) {
 }
 
 function formatCount(value) {
-  return Number(value).toLocaleString('en-US');
+  return String(Math.round(Number(value)));
 }
 
 function formatRate(value) {
