@@ -62,6 +62,7 @@ jobs:
           const failed = metrics.http_req_failed?.values || {};
           const requests = metrics.http_reqs?.values || {};
           const checks = metrics.checks?.values || {};
+          const statusCount = (name) => metrics[name]?.values?.count ?? 0;
 
           const rows = [
             ['Peak VUs', process.env.MAX_VUS],
@@ -72,9 +73,18 @@ jobs:
             ['Failure rate', failed.rate != null ? `${(failed.rate * 100).toFixed(3)}%` : 'n/a'],
             ['Check pass rate', checks.rate != null ? `${(checks.rate * 100).toFixed(3)}%` : 'n/a'],
           ];
+          const statusRows = [
+            ['200', statusCount('http_response_status_200')],
+            ['403', statusCount('http_response_status_403')],
+            ['429', statusCount('http_response_status_429')],
+            ['5xx', statusCount('http_response_status_5xx')],
+            ['Other / network', statusCount('http_response_status_other')],
+          ];
 
           let md = `## Blaqjaq k6 production result\n\nTarget: ${process.env.BASE_URL}\n\n| Metric | Measured |\n| --- | ---: |\n`;
           md += rows.map(([k, v]) => `| ${k} | ${v} |`).join('\n');
+          md += '\n\n### Response status summary\n\n| Status | Count |\n| --- | ---: |\n';
+          md += statusRows.map(([k, v]) => `| ${k} | ${v} |`).join('\n');
           md += '\n';
           fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md);
           NODE
