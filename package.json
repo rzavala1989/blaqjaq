@@ -36,6 +36,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "perf:up": "docker compose -f performance/docker-compose.yml up -d influxdb grafana",
+    "perf:load": "docker compose -f performance/docker-compose.yml run --rm k6",
+    "perf:down": "docker compose -f performance/docker-compose.yml down"
   }
 }
