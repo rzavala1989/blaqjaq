@@ -1,0 +1,88 @@
+name: Production performance
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Deployment URL to test
+        required: false
+        default: https://blaqjaq.vercel.app
+      max_vus:
+        description: Peak virtual users
+        required: false
+        default: '100'
+  push:
+    branches:
+      - master
+    paths:
+      - 'performance/**'
+      - '.github/workflows/performance.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  k6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE_URL: ${{ inputs.base_url || 'https://blaqjaq.vercel.app' }}
+      MAX_VUS: ${{ inputs.max_vus || '100' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare results directory
+        run: mkdir -p performance/results
+
+      - name: Run k6 production load test
+        run: |
+          docker run --rm \
+            -e BASE_URL \
+            -e MAX_VUS \
+            -v "$PWD/performance:/scripts" \
+            grafana/k6:latest \
+            run --summary-export=/scripts/results/summary.json /scripts/k6/load.js
+
+      - name: Publish measured summary
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'performance/results/summary.json';
+          if (!fs.existsSync(path)) {
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## k6 result\n\nNo summary artifact was produced.\n');
+            process.exit(0);
+          }
+
+          const result = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const metrics = result.metrics || {};
+          const duration = metrics.http_req_duration?.values || {};
+          const failed = metrics.http_req_failed?.values || {};
+          const requests = metrics.http_reqs?.values || {};
+          const checks = metrics.checks?.values || {};
+
+          const rows = [
+            ['Peak VUs', process.env.MAX_VUS],
+            ['Requests', requests.count ?? 'n/a'],
+            ['Request rate', requests.rate != null ? `${requests.rate.toFixed(2)} req/s` : 'n/a'],
+            ['p95 latency', duration['p(95)'] != null ? `${duration['p(95)'].toFixed(2)} ms` : 'n/a'],
+            ['p99 latency', duration['p(99)'] != null ? `${duration['p(99)'].toFixed(2)} ms` : 'n/a'],
+            ['Failure rate', failed.rate != null ? `${(failed.rate * 100).toFixed(3)}%` : 'n/a'],
+            ['Check pass rate', checks.rate != null ? `${(checks.rate * 100).toFixed(3)}%` : 'n/a'],
+          ];
+
+          let md = `## Blaqjaq k6 production result\n\nTarget: ${process.env.BASE_URL}\n\n| Metric | Measured |\n| --- | ---: |\n`;
+          md += rows.map(([k, v]) => `| ${k} | ${v} |`).join('\n');
+          md += '\n';
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md);
+          NODE
+
+      - name: Upload raw k6 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-production-summary
+          path: performance/results/summary.json
+          if-no-files-found: warn
