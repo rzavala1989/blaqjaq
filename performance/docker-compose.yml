@@ -1,0 +1,35 @@
+services:
+  influxdb:
+    image: influxdb:1.8
+    environment:
+      INFLUXDB_DB: k6
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+
+  grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      - influxdb
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+
+  k6:
+    image: grafana/k6:latest
+    depends_on:
+      - influxdb
+    environment:
+      BASE_URL: ${BASE_URL:-https://blaqjaq.vercel.app}
+      MAX_VUS: ${MAX_VUS:-100}
+    volumes:
+      - ./k6:/scripts:ro
+    command: run --out influxdb=http://influxdb:8086/k6 /scripts/load.js
+
+volumes:
+  influxdb-data:
+  grafana-data:
