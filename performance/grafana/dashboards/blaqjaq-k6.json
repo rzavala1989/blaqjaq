@@ -1,0 +1,61 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 0,
+  "panels": [
+    {
+      "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "targets": [
+        { "measurement": "http_req_duration", "orderByTime": "ASC", "policy": "default", "query": "SELECT percentile(\"value\", 95) FROM \"http_req_duration\" WHERE $timeFilter GROUP BY time($__interval) fill(null)", "rawQuery": true, "refId": "A", "resultFormat": "time_series" },
+        { "measurement": "http_req_duration", "orderByTime": "ASC", "policy": "default", "query": "SELECT percentile(\"value\", 99) FROM \"http_req_duration\" WHERE $timeFilter GROUP BY time($__interval) fill(null)", "rawQuery": true, "refId": "B", "resultFormat": "time_series" }
+      ],
+      "title": "HTTP latency p95 / p99",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "targets": [
+        { "measurement": "http_reqs", "orderByTime": "ASC", "policy": "default", "query": "SELECT sum(\"value\") / ($__interval_ms / 1000) FROM \"http_reqs\" WHERE $timeFilter GROUP BY time($__interval) fill(0)", "rawQuery": true, "refId": "A", "resultFormat": "time_series" }
+      ],
+      "title": "Request throughput",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 3,
+      "targets": [
+        { "measurement": "vus", "orderByTime": "ASC", "policy": "default", "query": "SELECT max(\"value\") FROM \"vus\" WHERE $timeFilter GROUP BY time($__interval) fill(null)", "rawQuery": true, "refId": "A", "resultFormat": "time_series" }
+      ],
+      "title": "Active virtual users",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 4,
+      "targets": [
+        { "measurement": "http_req_failed", "orderByTime": "ASC", "policy": "default", "query": "SELECT mean(\"value\") FROM \"http_req_failed\" WHERE $timeFilter GROUP BY time($__interval) fill(null)", "rawQuery": true, "refId": "A", "resultFormat": "time_series" }
+      ],
+      "title": "HTTP failure rate",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "tags": ["blaqjaq", "k6", "performance"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "timezone": "browser",
+  "title": "Blaqjaq · k6 production load",
+  "uid": "blaqjaq-k6",
+  "version": 1
+}
