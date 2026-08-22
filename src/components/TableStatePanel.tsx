@@ -13,6 +13,10 @@ const Panel = styled.div`
   font-size: 0.78rem;
   pointer-events: none;
   min-width: 130px;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
 `;
 
 const Row = styled.div`

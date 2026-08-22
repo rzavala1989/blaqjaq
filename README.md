@@ -2,7 +2,7 @@
 
 **3D blackjack with a 1951 Flamingo-era aesthetic.** A pure reducer game engine with full basic strategy analysis, session analytics, procedural audio, and a film noir Three.js scene built with React Three Fiber.
 
-**[Play Live](https://blaqjaq.vercel.app)** &nbsp;|&nbsp; **Built with:** React 19, TypeScript, Three.js, React Three Fiber, Vite 6, Vitest
+**[Play Live](https://blaqjaq.vercel.app)** &nbsp;|&nbsp; **Built with:** React 19, TypeScript, Three.js, React Three Fiber, Vite 8, Vitest
 
 <br/>
 

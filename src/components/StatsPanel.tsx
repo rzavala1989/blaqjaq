@@ -16,6 +16,12 @@ const Wrapper = styled.div`
   flex-direction: column;
   gap: 0.5rem;
   pointer-events: none;
+
+  @media (max-width: 600px) {
+    top: 0.6rem;
+    left: 0.6rem;
+    gap: 0.35rem;
+  }
 `;
 
 const Box = styled.div`
@@ -25,10 +31,20 @@ const Box = styled.div`
   padding: 1rem 1.35rem;
   font-family: 'Special Elite', 'Courier New', monospace;
   font-size: 1rem;
+
+  @media (max-width: 600px) {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.68rem;
+    max-width: calc(100vw - 1.2rem);
+  }
 `;
 
 const StatsBox = styled(Box)`
   width: 240px;
+
+  @media (max-width: 600px) {
+    width: 145px;
+  }
 `;
 
 const Row = styled.div`
@@ -36,6 +52,11 @@ const Row = styled.div`
   justify-content: space-between;
   gap: 2rem;
   padding: 0.28rem 0;
+
+  @media (max-width: 600px) {
+    gap: 0.7rem;
+    padding: 0.16rem 0;
+  }
 `;
 
 const Label = styled.span`
@@ -68,6 +89,11 @@ const HandLabel = styled.div`
   text-transform: uppercase;
   font-size: 0.82rem;
   margin-bottom: 0.4rem;
+
+  @media (max-width: 600px) {
+    font-size: 0.62rem;
+    margin-bottom: 0.25rem;
+  }
 `;
 
 const HandRow = styled.div`
@@ -93,17 +119,27 @@ const MiniCard = styled.div<{ $red?: boolean; $faceDown?: boolean }>`
   position: relative;
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+
+  @media (max-width: 600px) {
+    width: 35px;
+    height: 50px;
+    padding: 2px 3px;
+  }
 `;
 
 const MiniRank = styled.span`
   font-size: 17px;
   line-height: 1;
+
+  @media (max-width: 600px) { font-size: 12px; }
 `;
 
 const MiniSuit = styled.span`
   font-size: 13px;
   line-height: 1;
   margin-top: 1px;
+
+  @media (max-width: 600px) { font-size: 9px; }
 `;
 
 const MiniCenterSuit = styled.span<{ $red?: boolean }>`
@@ -114,6 +150,8 @@ const MiniCenterSuit = styled.span<{ $red?: boolean }>`
   font-size: 32px;
   opacity: 0.15;
   color: ${({ $red }) => $red ? '#cc2222' : '#111'};
+
+  @media (max-width: 600px) { font-size: 20px; }
 `;
 
 const MiniBackPattern = styled.div`
@@ -129,6 +167,8 @@ const MiniBackQ = styled.span`
   font-family: serif;
   color: rgba(240, 230, 200, 0.4);
   z-index: 1;
+
+  @media (max-width: 600px) { font-size: 16px; }
 `;
 
 const HandScore = styled.span`
@@ -138,6 +178,11 @@ const HandScore = styled.span`
   font-weight: bold;
   margin-left: 0.6rem;
   font-variant-numeric: tabular-nums;
+
+  @media (max-width: 600px) {
+    font-size: 0.85rem;
+    margin-left: 0.3rem;
+  }
 `;
 
 function MiniCardEl({ card }: { card: Card }) {

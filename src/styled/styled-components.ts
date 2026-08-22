@@ -409,6 +409,11 @@ export const BarLeftSection = styled.div`
   flex-direction: column;
   gap: 0.2rem;
   min-width: 10rem;
+
+  @media (max-width: 600px) {
+    min-width: 3.6rem;
+    gap: 0.1rem;
+  }
 `;
 
 export const BarCenter = styled.div`
@@ -417,6 +422,12 @@ export const BarCenter = styled.div`
   gap: 0.85rem;
   justify-content: center;
   align-items: center;
+
+  @media (max-width: 600px) {
+    gap: 0.35rem;
+    justify-content: flex-end;
+    min-width: 0;
+  }
 `;
 
 export const BarRightSection = styled.div`
@@ -424,6 +435,10 @@ export const BarRightSection = styled.div`
   align-items: center;
   min-width: 10rem;
   justify-content: flex-end;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
 `;
 
 export const BarBalance = styled.div`
@@ -432,6 +447,11 @@ export const BarBalance = styled.div`
   color: rgba(58, 104, 152, 0.85);
   letter-spacing: 0.08em;
   font-variant-numeric: tabular-nums;
+
+  @media (max-width: 600px) {
+    font-size: 0.67rem;
+    letter-spacing: 0.04em;
+  }
 `;
 
 export const BarBetLabel = styled.div`
@@ -441,6 +461,11 @@ export const BarBetLabel = styled.div`
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
+
+  @media (max-width: 600px) {
+    font-size: 0.58rem;
+    letter-spacing: 0.05em;
+  }
 `;
 
 export const BarPlayerScore = styled.div`
@@ -471,6 +496,13 @@ export const ChipButton = styled.button<{ $color: string }>`
   transition: box-shadow 0.2s ease;
   flex-shrink: 0;
   letter-spacing: 0.04em;
+
+  @media (max-width: 600px) {
+    width: 38px;
+    height: 38px;
+    font-size: 0.64rem;
+    border-width: 1px;
+  }
 
   &:hover:not(:disabled) {
     box-shadow:
@@ -519,8 +551,10 @@ const grain = keyframes`
 
 export const SceneWrapper = styled.div<{ $enableGrain?: boolean }>`
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100svh;
+  overflow: hidden;
 
   /* Film grain overlay */
   &::after {
@@ -557,6 +591,53 @@ export const SceneNotification = styled.div`
   white-space: nowrap;
 `;
 
+export const SceneHeader = styled.div`
+  position: fixed;
+  top: 1.65rem;
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  color: rgba(228, 220, 200, 0.86);
+  font-family: 'Playfair Display', Georgia, serif;
+  pointer-events: none;
+  text-align: center;
+  text-transform: uppercase;
+
+  strong {
+    font-size: clamp(1.35rem, 2.2vw, 2rem);
+    font-weight: 700;
+    letter-spacing: 0.36em;
+    padding-left: 0.36em;
+    text-shadow: 0 0 24px rgba(200, 185, 155, 0.15);
+  }
+
+  span {
+    color: rgba(200, 185, 155, 0.52);
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+  }
+
+  @media (max-width: 600px) {
+    top: 7.5rem;
+    gap: 0;
+
+    strong {
+      font-size: 1rem;
+      letter-spacing: 0.26em;
+      padding-left: 0.26em;
+    }
+
+    span {
+      display: none;
+    }
+  }
+`;
+
 export const ControlsPanel = styled.div`
   position: absolute;
   bottom: 0;
@@ -572,6 +653,11 @@ export const ControlsPanel = styled.div`
   display: flex;
   align-items: center;
   padding: 0 1.75rem;
+
+  @media (max-width: 600px) {
+    height: 88px;
+    padding: 0 0.65rem;
+  }
 `;
 
 type CasinoVariant = 'deal' | 'action' | 'power' | 'danger' | 'gold' | 'rebuy';
@@ -627,6 +713,13 @@ export const CasinoButton = styled.button<{ $variant?: CasinoVariant; $hint?: bo
   border: 1px solid ${({ $variant = 'action' }) => variantBorder[$variant]};
   box-shadow: 0 0 0 rgba(0, 0, 0, 0);
 
+  @media (max-width: 600px) {
+    min-height: 2.5rem;
+    padding: 0.55rem 0.6rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+  }
+
   &:hover:not(:disabled) {
     box-shadow:
       0 0 10px ${({ $variant = 'action' }) => variantGlow[$variant]},
@@ -679,6 +772,13 @@ export const PanelToggleButton = styled.button<{ $open: boolean }>`
   padding: 0.35rem 0.6rem;
   cursor: pointer;
   transition: right 0.3s ease, color 0.15s, border-color 0.15s;
+
+  @media (max-width: 600px) {
+    top: 0.6rem;
+    right: 0.6rem;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.5rem;
+  }
 
   &:hover {
     color: rgba(228, 220, 200, 0.85);

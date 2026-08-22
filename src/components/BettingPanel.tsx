@@ -14,6 +14,10 @@ const BettingRow = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
+
+  @media (max-width: 600px) {
+    gap: 0.3rem;
+  }
 `;
 
 interface BettingPanelProps {
@@ -40,16 +44,17 @@ export function BettingPanel({ game, currentBet, addToBet, clearBet, onDeal, dea
             $color={CHIP_COLORS[denom]}
             disabled={disabled}
             onClick={() => { addToBet(denom); playChipClick(); }}
+            aria-label={`Add ${denom} to wager`}
             title={String(keyHint)}
           >
             {denom}
           </ChipButton>
         );
       })}
-      <CasinoButton $variant="danger" onClick={clearBet} disabled={currentBet <= minBet} title="C">
+      <CasinoButton $variant="danger" onClick={clearBet} disabled={currentBet === 0} title="C">
         Clear
       </CasinoButton>
-      <CasinoButton $variant="deal" onClick={onDeal} disabled={!dealtReady || game.chips < currentBet || game.bankrupt} title="Space">
+      <CasinoButton $variant="deal" onClick={onDeal} disabled={!dealtReady || currentBet < minBet || game.chips < currentBet || game.bankrupt} title="Space">
         Deal
       </CasinoButton>
     </BettingRow>

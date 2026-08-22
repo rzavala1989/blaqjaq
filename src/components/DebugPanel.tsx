@@ -22,6 +22,10 @@ const Wrapper = styled.div`
   font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 11px;
   pointer-events: auto;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
 `;
 
 const Toggle = styled.button`
@@ -86,7 +90,7 @@ export function DebugPanel({ flags, onChange, open, onToggleOpen }: DebugPanelPr
   return (
     <Wrapper>
       {open && (
-        <Panel>
+        <Panel id="performance-settings">
           {(Object.keys(labels) as (keyof DebugFlags)[]).map(key => (
             <Row key={key}>
               <input
@@ -99,7 +103,7 @@ export function DebugPanel({ flags, onChange, open, onToggleOpen }: DebugPanelPr
           ))}
         </Panel>
       )}
-      <Toggle onClick={onToggleOpen}>
+      <Toggle type="button" aria-expanded={open} aria-controls="performance-settings" onClick={onToggleOpen}>
         {open ? '▾' : '▸'} perf
       </Toggle>
     </Wrapper>

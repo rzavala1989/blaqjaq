@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { LineChart, Line, ReferenceLine, ResponsiveContainer, YAxis, Area, AreaChart, Dot } from 'recharts';
+import { ReferenceLine, YAxis, Area, AreaChart, Dot } from 'recharts';
 import type { SessionStats, HandRecord } from '../game/analytics';
 import type { GameConfig } from '../game/constants';
 import { HandHistoryPanel } from './HandHistoryPanel';
@@ -9,16 +9,14 @@ import { HandHistoryPanel } from './HandHistoryPanel';
 /*  Styled components                                                  */
 /* ------------------------------------------------------------------ */
 
-const Overlay = styled.div<{ $open: boolean }>`
+const Overlay = styled.div`
   position: fixed;
   inset: 0;
   z-index: 49;
-  pointer-events: ${({ $open }) => ($open ? 'auto' : 'none')};
-  background: ${({ $open }) => ($open ? 'rgba(0,0,0,0.25)' : 'transparent')};
-  transition: background 0.3s;
+  background: rgba(0, 0, 0, 0.25);
 `;
 
-const Panel = styled.div<{ $open: boolean }>`
+const Panel = styled.div`
   position: fixed;
   top: 0;
   right: 0;
@@ -32,9 +30,9 @@ const Panel = styled.div<{ $open: boolean }>`
   font-size: 0.75rem;
   overflow-y: auto;
   overflow-x: hidden;
-  transform: translateX(${({ $open }) => ($open ? '0' : '100%')});
-  transition: transform 0.3s ease;
-  pointer-events: auto;
+  @media (max-width: 600px) {
+    width: min(100vw, 360px);
+  }
 
   &::-webkit-scrollbar {
     width: 4px;
@@ -55,6 +53,33 @@ const PanelContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+`;
+
+const PanelHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: rgba(228, 220, 200, 0.9);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+`;
+
+const CloseButton = styled.button`
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  background: transparent;
+  color: rgba(228, 220, 200, 0.8);
+  border: 1px solid rgba(200, 185, 155, 0.26);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1rem;
+
+  &:hover {
+    color: #fff;
+    border-color: rgba(200, 185, 155, 0.6);
+  }
 `;
 
 const Section = styled.div``;
@@ -239,7 +264,6 @@ export interface TendenciesPanelProps {
   sessionStats: SessionStats;
   handHistory: HandRecord[];
   config: GameConfig;
-  open: boolean;
   onToggle: () => void;
 }
 
@@ -247,10 +271,23 @@ export function TendenciesPanel({
   sessionStats,
   handHistory,
   config,
-  open,
   onToggle,
 }: TendenciesPanelProps) {
   const stats = sessionStats;
+  const chartWrapperRef = useRef<HTMLDivElement>(null);
+  const [chartWidth, setChartWidth] = useState(0);
+
+  // Measure the fixed panel directly. This avoids ResponsiveContainer's
+  // transient -1 × -1 measurement when a lazily opened dialog first mounts.
+  useEffect(() => {
+    const wrapper = chartWrapperRef.current;
+    if (!wrapper) return;
+    const updateWidth = () => setChartWidth(Math.floor(wrapper.getBoundingClientRect().width));
+    updateWidth();
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(wrapper);
+    return () => observer.disconnect();
+  }, []);
 
   /* Chart data */
   const chartData = useMemo(() => {
@@ -276,19 +313,22 @@ export function TendenciesPanel({
 
   return (
     <>
-      {open && <Overlay $open={open} onClick={onToggle} />}
+      <Overlay aria-hidden="true" onClick={onToggle} />
 
-      <Panel $open={open}>
+      <Panel id="session-statistics" role="dialog" aria-modal="true" aria-label="Session statistics">
         <PanelContent>
+          <PanelHeader>
+            <span>Session Stats</span>
+            <CloseButton type="button" aria-label="Close session statistics" onClick={onToggle}>×</CloseButton>
+          </PanelHeader>
           {/* ---- Session Shape ---- */}
           <Section>
             <SectionHeader>Session Shape</SectionHeader>
-            {chartData.length === 0 ? (
-              <ChartPlaceholder>Play a hand to see your session chart</ChartPlaceholder>
-            ) : (
-              <ChartWrapper>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+            <ChartWrapper ref={chartWrapperRef}>
+              {chartData.length === 0 ? (
+                <ChartPlaceholder>Play a hand to see your session chart</ChartPlaceholder>
+              ) : chartWidth > 0 ? (
+                  <AreaChart width={chartWidth} height={120} data={chartData} margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
                     <defs>
                       <linearGradient id="chipFill" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#c9a84c" stopOpacity={0.2} />
@@ -317,9 +357,10 @@ export function TendenciesPanel({
                       isAnimationActive={false}
                     />
                   </AreaChart>
-                </ResponsiveContainer>
-              </ChartWrapper>
-            )}
+              ) : (
+                <ChartPlaceholder>Preparing session chart</ChartPlaceholder>
+              )}
+            </ChartWrapper>
           </Section>
 
           <Divider />

@@ -23,7 +23,7 @@ import { Phase, Action } from '../game/constants';
 import type { ActionValue } from '../game/constants';
 import { getOptimalAction } from '../game/basicStrategy';
 import { runningCount, trueCount } from '../game/counting';
-import { SceneWrapper, SceneNotification, PanelToggleButton } from '../styled/styled-components';
+import { SceneWrapper, SceneNotification, SceneHeader, PanelToggleButton } from '../styled/styled-components';
 
 const TendenciesPanelLazy = lazy(() =>
   import('./TendenciesPanel').then(m => ({ default: m.TendenciesPanel }))
@@ -77,10 +77,8 @@ export default function Scene() {
   // Tendencies panel: chunk loads on first open (recharts stays out of the
   // main bundle until then)
   const [showTendencies, setShowTendencies] = useState(false);
-  const [tendenciesLoaded, setTendenciesLoaded] = useState(false);
 
   const toggleTendencies = useCallback(() => {
-    setTendenciesLoaded(true);
     setShowTendencies(o => !o);
   }, []);
 
@@ -97,20 +95,23 @@ export default function Scene() {
   }, [trainerPrefs, countChecks]);
 
   // Betting state
-  const [currentBet, setCurrentBet] = useState(game.config.minimumBet);
+  // A wager starts empty. Previously the minimum bet was preloaded, which
+  // made a tap on the 100 chip read as a surprising $110 wager.
+  const [currentBet, setCurrentBet] = useState(0);
 
   const addToBet = useCallback((n: number) => {
     setCurrentBet(prev => Math.min(prev + n, game.config.maximumBet, game.chips));
   }, [game.config.maximumBet, game.chips]);
 
   const clearBet = useCallback(() => {
-    setCurrentBet(game.config.minimumBet);
-  }, [game.config.minimumBet]);
+    setCurrentBet(0);
+  }, []);
 
   const handleDeal = useCallback(() => {
+    if (currentBet < game.config.minimumBet) return;
     game.dealRound(currentBet);
     clearBet();
-  }, [currentBet, game, clearBet]);
+  }, [currentBet, game, clearBet, game.config.minimumBet]);
 
   // Result flash state
   const [flashResult, setFlashResult] = useState<string | null>(null);
@@ -274,7 +275,7 @@ export default function Scene() {
 
   const handleResetSession = useCallback(() => {
     game.resetSession();
-    setCurrentBet(game.config.minimumBet);
+    setCurrentBet(0);
     streakRef.current = { type: null, count: 0 };
     setStreakDisplay({ type: null, count: 0 });
     setFlashResult(null);
@@ -337,6 +338,11 @@ export default function Scene() {
         />
       </Canvas>
 
+      <SceneHeader aria-label="Blaqjaq table rules">
+        <strong>Blaqjaq</strong>
+        <span>6 decks · dealer hits soft 17 · blackjack pays 3:2</span>
+      </SceneHeader>
+
       <GameControls
         game={game}
         dealtReady={dealtReady}
@@ -374,17 +380,23 @@ export default function Scene() {
         />
       )}
 
-      <PanelToggleButton $open={showTendencies} onClick={toggleTendencies}>
+      <PanelToggleButton
+        $open={showTendencies}
+        type="button"
+        aria-expanded={showTendencies}
+        aria-controls="session-statistics"
+        aria-haspopup="dialog"
+        onClick={toggleTendencies}
+      >
         {showTendencies ? '✕' : '≡ Stats'}
       </PanelToggleButton>
 
-      {tendenciesLoaded && (
+      {showTendencies && (
         <Suspense fallback={null}>
           <TendenciesPanelLazy
             sessionStats={game.sessionStats}
             handHistory={game.handHistory}
             config={game.config}
-            open={showTendencies}
             onToggle={toggleTendencies}
           />
         </Suspense>

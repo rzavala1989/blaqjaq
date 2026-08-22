@@ -59,7 +59,7 @@ export function useKeyboardShortcuts(deps: ShortcutDeps): void {
 
       if (key === ' ') {
         e.preventDefault();
-        if (isBetting && dealtReady && !game.bankrupt && game.chips >= currentBet) {
+        if (isBetting && dealtReady && !game.bankrupt && currentBet >= game.config.minimumBet && game.chips >= currentBet) {
           onDeal();
         } else if (game.phase === Phase.SETTLED && dealtReady && !game.bankrupt) {
           game.newRound();

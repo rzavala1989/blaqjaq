@@ -62,6 +62,12 @@ const Wrapper = styled.div`
   font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 11px;
   pointer-events: auto;
+
+  @media (max-width: 600px) {
+    bottom: 100px;
+    right: 0.75rem;
+    font-size: 12px;
+  }
 `;
 
 const Toggle = styled.button`
@@ -75,6 +81,11 @@ const Toggle = styled.button`
   display: block;
   width: 100%;
   text-align: left;
+
+  @media (max-width: 600px) {
+    min-height: 2.25rem;
+    padding: 0.35rem 0.6rem;
+  }
 
   &:hover {
     background: rgba(40, 40, 40, 0.85);
@@ -150,7 +161,7 @@ export function TrainerPanel({
   return (
     <Wrapper>
       {open && (
-        <Panel>
+        <Panel id="trainer-settings">
           <Row>
             <input
               type="checkbox"
@@ -176,7 +187,7 @@ export function TrainerPanel({
           <ResetButton onClick={onResetSession}>reset session</ResetButton>
         </Panel>
       )}
-      <Toggle onClick={onToggleOpen}>{open ? '▾' : '▸'} trainer</Toggle>
+      <Toggle type="button" aria-expanded={open} aria-controls="trainer-settings" onClick={onToggleOpen}>{open ? '▾' : '▸'} trainer</Toggle>
     </Wrapper>
   );
 }
