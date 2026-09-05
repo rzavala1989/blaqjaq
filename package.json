@@ -37,6 +37,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
+    "test:run": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run test:run && npm run build",
     "perf:up": "docker compose -f performance/docker-compose.yml up -d influxdb grafana",
     "perf:load": "docker compose -f performance/docker-compose.yml run --rm k6",
     "perf:down": "docker compose -f performance/docker-compose.yml down"

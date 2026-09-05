@@ -109,7 +109,7 @@ Two opt-in training layers, both persisted across sessions. Coach mode highlight
 
 ## Testing
 
-158 tests across 7 test files covering the entire game engine:
+159 tests across 8 test files covering the game engine and application entrypoint:
 
 | File | Tests | Coverage |
 |------|-------|----------|
@@ -120,9 +120,11 @@ Two opt-in training layers, both persisted across sessions. Coach mode highlight
 | `deck.test.ts` | 10 | Shoe creation, draw mechanics, reshuffle threshold |
 | `scoring.test.ts` | 13 | Hand evaluation: soft/hard detection, ace revaluation, bust, blackjack |
 | `persistence.test.ts` | 6 | Session round-trips, corrupt data handling, history cap |
+| `App.test.tsx` | 1 | Application entrypoint export contract |
 
 ```bash
 npm test        # run all tests
+npm run check   # typecheck, run tests once, and build
 npm run dev     # development server
 npm run build   # production build
 ```
@@ -139,7 +141,7 @@ npm run build   # production build
 | Animation | react-spring, GSAP |
 | Styling | styled-components v6 |
 | Charts | recharts v3 |
-| Build | Vite 6 |
+| Build | Vite 8 |
 | Testing | Vitest |
 | Language | TypeScript (strict) |
 | Deployment | Vercel |
